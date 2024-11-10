@@ -1,0 +1,105 @@
+// WAR! Game Overview
+// Defining the Card class - represents a single playing card. Each Card object has two properties: Values (Numbers 2-10 + 11-14 for Jack, Queen, King, Ace) and Suits (Diamonds, Clubs, Hearts, and Spades)
+class Card {
+    constructor(value, suit) {
+      this.value = value;
+      this.suit = suit;
+    }
+    describe() {
+      return `${this.value} of ${this.suit}`;
+    }
+  }
+// Defining the Deck class - responsible for creating and managing a deck of cards. 
+// Constructor: this.cards is an array to hold all the Card objects. Two arrays, suits and values, define the four suits and the 13 possible values.
+// The nested for loops create one Card for each suit-value combination (52 cards in total).
+// shuffle() Method: Uses a shuffle algorithm to randomize the order of this.cards. It iterates from the last card down to the first, swapping each card with another random card in the deck.
+// deal() Method: Splits the deck in half and returns one half (26 cards) to be given to a player.
+
+  class Deck {
+    constructor() {
+      this.cards = [];
+      this.generateDeck();
+      this.shuffle();
+    }
+    generateDeck() {
+      const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
+      for (let suit of suits) {
+        for (let value = 2; value <= 14; value++) {
+          this.cards.push(new Card(value, suit));
+        }
+      }
+    }
+    shuffle() {
+      this.cards.sort(() => Math.random() - 0.5);
+    }
+    deal() {
+      return [this.cards.slice(0, 26), this.cards.slice(26, 52)];
+    }
+  }
+// Defining the Player class - The Player class represents a player in the game.
+// Properties: name: stores the player's name, cards: an array holding the player's cards, score: tracks the player’s score, initialized to 0.
+// Methods: playCard(): Removes and returns the first card from this.cards, representing the player "playing" a card.
+// addPoint(): Increments the player’s score by 1.
+// receiveCards(cards): Assigns the dealt cards to this.cards 
+  class Player {
+    constructor(name) {
+      this.name = name;
+      this.hand = [];
+      this.score = 0;
+    }
+    playCard() {
+      return this.hand.pop();
+    }
+    addPoint() {
+      this.score += 1;
+    }
+  }
+// Defining the Game Class: The Game class coordinates the game flow, bringing everything together.
+// Constructor: Initializes two players (player1 and player2).
+// Creates a new deck of cards.
+// start() Shuffle and Deal: Shuffles this.deck and then deals half the cards to each player.
+// Play Rounds: Iterates over 26 rounds, where each player plays one card:
+// card1 and card2 store the cards each player plays.
+// If card1 has a higher value, player1 gains a point. If card2 is higher, player2 gains a point. If they’re equal, neither player gets a point.
+
+  class Game {
+    constructor() {
+      this.deck = new Deck();
+      const [hand1, hand2] = this.deck.deal();
+      this.player1 = new Player("Player 1");
+      this.player2 = new Player("Player 2");
+      this.player1.hand = hand1;
+      this.player2.hand = hand2;
+    }
+    startGame() {
+      for (let i = 0; i < 26; i++) {
+        this.playRound();
+      }
+      this.determineWinner();
+    }
+    playRound() {
+      const card1 = this.player1.playCard();
+      const card2 = this.player2.playCard();
+      if (card1.value > card2.value) {
+        this.player1.addPoint();
+      } else if (card2.value > card1.value) {
+        this.player2.addPoint();
+      }
+    }
+// Determine Winner: After all rounds, the final score for each player is logged and the winner is announced based on the score comparison.
+    determineWinner() {
+      console.log(`Final Score: Player 1 - ${this.player1.score}, Player 2 - ${this.player2.score}`);
+      if (this.player1.score > this.player2.score) {
+        console.log("Player 1 Wins!");
+      } else if (this.player2.score > this.player1.score) {
+        console.log("Player 2 Wins!");
+      } else {
+        console.log("It's a tie!");
+      }
+    }
+  }
+  
+  // Start the game
+  const warGame = new Game();
+  warGame.startGame();
+  
